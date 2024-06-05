@@ -32,6 +32,7 @@ data = response.json()
 # check if data is retrieved
 if data["report"] == []:
     print ("Unable to retrieve data. Check the date entered and make sure the format is correct and the date is valid (up to current day only).")
+    exit()
 
 # put keys in a list
 for key in data["report"][0]:
