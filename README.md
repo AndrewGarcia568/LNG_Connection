@@ -8,7 +8,7 @@ To install above requirements
 2. "pip install requests"
 3. "pip install csv"
 
-Usage instructions
-1. This code scrapes operationally avaiable capacity of Creole trail from LNG Connection site.
+Usage guide
+1. This code scrapes operationally available capacity of Creole trail from LNG Connection site.
 2. User will input day (dd), month (mm), and year (yyyy) of desired data to scrape. Make sure date format is correct and date is valid (up to current date only)
 3. Script will generate a csv file on the local directory with the name "CreoleTrail-OperationallyAvailable-#month-#day-#year.csv"
