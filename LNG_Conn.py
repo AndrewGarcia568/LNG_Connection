@@ -6,14 +6,11 @@ Created on Wed June 05 10:53:55 2024
 """
 
 import requests
-import csv
+import pandas as pd
 
 # initialize global variables
 base_url = "https://lngconnectionapi.cheniere.com/api/Capacity/GetCapacity?tspNo=200&cycleId=0&locationId=0&beginDate="
-header_info = []
-column_headers = []
 column_headers_keys = []
-rows = []
 key_list = []
 
 # get input date
@@ -26,8 +23,11 @@ url = base_url + month + '/' + day + '/' + year
 # get json through xhr mimic
 response = requests.get(url)
 
-# parse as dict object
+# parse as json object
 data = response.json()
+
+#parse as pandas dataframe
+df = pd.DataFrame.from_records(data["report"])
 
 # check if data is retrieved
 if data["report"] == []:
@@ -38,49 +38,17 @@ if data["report"] == []:
 for key in data["report"][0]:
     key_list.append(key)
 
-# extract header data
-header_info.append("TSP: ")
-header_info.append(data["report"][0][key_list[0]])
-header_info.append("TSP Name: ")
-header_info.append(data['report'][0][key_list[1]])
-header_info.append("Cycle: ")
-header_info.append(data['report'][0][key_list[2]])
-header_info.append("Meas Basis: ")
-header_info.append(data['report'][0][key_list[11]])
-header_info.append("Post Date and Time: ")
-header_info.append(data['report'][0][key_list[3]])
-header_info.append("EFF Gas Day and Time: ")
-header_info.append(data['report'][0][key_list[4]])
+# getting header data
+header_keys = key_list[0:5]
+header_keys.append(key_list[11])
+header_data = df[header_keys][0:1]
+header_data.to_csv('CreoleTrail-OperationallyAvailable-' + month + '-' + day + '-' + year + '.csv', index = False)
 
-# construct column headers
-column_headers.append("Loc")
-column_headers.append("Loc Name")
-column_headers.append("Loc Purp Desc")
-column_headers.append("Loc/QTI")
-column_headers.append("All Qty Available?")
-column_headers.append("IT")
-column_headers.append("Design Capacity")
-column_headers.append("Operating Capacity")
-column_headers.append("Total Sched Quantity")
-column_headers.append("Operationally Available Capacity")
-column_headers.append("Flow Ind")
-
-# extract column headers keys
+# extract table column keys
 for i in range (7, 19):
     if key_list[i] != "meaS_BASIS":     
         column_headers_keys.append(key_list[i])
 
-# extract table data
-for i in data['report']:
-    row_holder = []
-    for j in column_headers_keys:
-        row_holder.append(i[j])
-    rows.append(row_holder)
-
-#writing to csv
-with open('CreoleTrail-OperationallyAvailable-' + month + '-' + day + '-' + year + ".csv", 'w', encoding = 'UTF8') as f:
-    writer = csv.writer(f)
-    writer.writerow(header_info)
-    writer.writerow(column_headers)
-    for i in rows:
-        writer.writerow(i)
+# getting table data
+table_data = df[column_headers_keys]
+table_data.to_csv('CreoleTrail-OperationallyAvailable-' + month + '-' + day + '-' + year + '.csv', mode = 'a')
